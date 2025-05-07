@@ -1,12 +1,28 @@
-# React + Vite
+# Task Management App (MERN Stack)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack task management application built using the MERN stack (MongoDB, Express.js, React.js, Node.js). Users can register, log in, and manage their tasks through a responsive web interface.
 
-Currently, two official plugins are available:
+🔗 **Live Demo:** [https://task-client-two-omega.vercel.app/](https://task-client-two-omega.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Frontend:** React.js
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB (via MongoDB Atlas)
+- **Authentication:** JWT (JSON Web Tokens)
+- **Other Libraries:**
+  - `bcrypt` for password hashing
+  - `cors`, `dotenv`, `mongoose`, `validator`
+
+---
+
+## 🚀 Features
+
+- User registration and login
+- JWT-based authentication
+- Create, read, update, delete (CRUD) tasks
+- Mark tasks as completed
+- Protected API routes
+- Responsive UI
