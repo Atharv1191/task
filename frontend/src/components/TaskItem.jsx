@@ -25,12 +25,6 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
     )
   }, [task.completed])
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("token")
-    if (!token) throw new Error("No auth token found")
-    return { Authorization: `Bearer ${token}` }
-  }
-
   const borderColor = isCompleted
     ? "border-green-500"
     : getPriorityColor(task.priority).split(" ")[0]
@@ -38,7 +32,11 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
   const handleComplete = async () => {
     const newStatus = isCompleted ? "No" : "Yes"
     try {
-      await axios.put(`${API_BASE}/${task._id}/gp`, { completed: newStatus }, { headers: getAuthHeaders() })
+      await axios.put(
+        `${API_BASE}/${task._id}/gp`,
+        { completed: newStatus },
+        { withCredentials: true }  // ← fix
+      )
       setIsCompleted(!isCompleted)
       onRefresh?.()
     } catch (err) {
@@ -55,7 +53,10 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE}/${task._id}/gp`, { headers: getAuthHeaders() })
+      await axios.delete(
+        `${API_BASE}/${task._id}/gp`,
+        { withCredentials: true }  // ← fix
+      )
       onRefresh?.()
     } catch (err) {
       console.error(err)
@@ -67,7 +68,11 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
     try {
       const payload = (({ title, description, priority, dueDate, completed }) =>
         ({ title, description, priority, dueDate, completed }))(updatedTask)
-      await axios.put(`${API_BASE}/${task._id}/gp`, payload, { headers: getAuthHeaders() })
+      await axios.put(
+        `${API_BASE}/${task._id}/gp`,
+        payload,
+        { withCredentials: true }  // ← fix
+      )
       setShowEditModal(false)
       onRefresh?.()
     } catch (err) {

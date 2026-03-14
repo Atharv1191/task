@@ -7,7 +7,6 @@ import "react-toastify/dist/ReactToastify.css"
 
 import { INPUT_WRAPPER, FULL_BUTTON, SECTION_WRAPPER, BACK_BUTTON, DANGER_BTN, personalFields, securityFields } from '../assets/dummy'
 
-// Constants & Dummy Data
 const API_URL = "https://task-backend-virid.vercel.app"
 
 export default function Profile({ setCurrentUser, onLogout }) {
@@ -16,10 +15,8 @@ export default function Profile({ setCurrentUser, onLogout }) {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    if (!token) return
     axios
-      .get(`${API_URL}/api/user/me`, { headers: { Authorization: `Bearer ${token}` } })
+      .get(`${API_URL}/api/user/me`, { withCredentials: true })  // ← fix
       .then(({ data }) => {
         if (data.success) setProfile({ name: data.user.name, email: data.user.email })
         else toast.error(data.message)
@@ -30,11 +27,10 @@ export default function Profile({ setCurrentUser, onLogout }) {
   const saveProfile = async (e) => {
     e.preventDefault()
     try {
-      const token = localStorage.getItem("token")
       const { data } = await axios.put(
         `${API_URL}/api/user/profile`,
         { name: profile.name, email: profile.email },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }  // ← fix
       )
       if (data.success) {
         setCurrentUser((prev) => ({
@@ -57,11 +53,10 @@ export default function Profile({ setCurrentUser, onLogout }) {
       return toast.error("Passwords do not match")
     }
     try {
-      const token = localStorage.getItem("token")
       const { data } = await axios.put(
         `${API_URL}/api/user/password`,
         { currentPassword: passwords.current, newPassword: passwords.new },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { withCredentials: true }  // ← fix
       )
       if (data.success) {
         toast.success("Password changed")

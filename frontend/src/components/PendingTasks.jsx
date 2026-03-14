@@ -13,26 +13,25 @@ const sortOptions = [
 ];
 
 const PendingTasks = () => {
-  const { tasks = [], refreshTasks } = useOutletContext();
+  const { tasks = [], refreshTasks, onLogout } = useOutletContext();
   const [sortBy, setSortBy] = useState('newest');
   const [selectedTask, setSelectedTask] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  const getHeaders = () => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('No auth token found');
-    return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
-  };
-
   const handleDelete = useCallback(async (id) => {
-    await fetch(`${API_BASE}/${id}/gp`, { method: 'DELETE', headers: getHeaders() });
+    await fetch(`${API_BASE}/${id}/gp`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
     refreshTasks();
   }, [refreshTasks]);
 
   const handleToggleComplete = useCallback(async (id, completed) => {
     await fetch(`${API_BASE}/${id}/gp`, {
       method: 'PUT',
-      headers: getHeaders(),
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ completed: completed ? 'Yes' : 'No' }),
     });
     refreshTasks();
@@ -49,6 +48,12 @@ const PendingTasks = () => {
       return order[b.priority.toLowerCase()] - order[a.priority.toLowerCase()];
     });
   }, [tasks, sortBy]);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedTask(null);
+    refreshTasks();
+  };
 
   return (
     <div className={layoutClasses.container}>
@@ -80,6 +85,7 @@ const PendingTasks = () => {
           </div>
         </div>
       </div>
+
       <div className={layoutClasses.addBox} onClick={() => setShowModal(true)}>
         <div className="flex items-center justify-center gap-3 text-gray-500 group-hover:text-purple-600 transition-colors">
           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200">
@@ -88,6 +94,7 @@ const PendingTasks = () => {
           <span className="font-medium">Add New Task</span>
         </div>
       </div>
+
       <div className="space-y-4">
         {sortedPendingTasks.length === 0 ? (
           <div className={layoutClasses.emptyState}>
@@ -107,7 +114,7 @@ const PendingTasks = () => {
               onDelete={() => handleDelete(task._id || task.id)}
               onToggleComplete={() => handleToggleComplete(
                 task._id || task.id,
-                !t.completed
+                !task.completed  // ← fix: t.completed → task.completed
               )}
               onEdit={() => { setSelectedTask(task); setShowModal(true); }}
               onRefresh={refreshTasks}
@@ -115,10 +122,13 @@ const PendingTasks = () => {
           ))
         )}
       </div>
+
       <TaskModal
         isOpen={!!selectedTask || showModal}
-        onClose={() => { setShowModal(false); setSelectedTask(null); refreshTasks(); }}
+        onClose={handleCloseModal}
         taskToEdit={selectedTask}
+        onSave={handleCloseModal}   
+        onLogout={onLogout}         
       />
     </div>
   );
