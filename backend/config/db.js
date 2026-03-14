@@ -1,12 +1,21 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+import dns from "dns";
 
-// Connect to the MongoDB database
+dns.setServers([
+  "1.1.1.1",
+  "8.8.8.8"
+]);
+
 const connectDB = async () => {
-  mongoose.connection.on('connected', () => {
-    console.log('Database connected');
-  });
+  try {
+    mongoose.connection.on("connected", () => {
+      console.log("Database connected");
+    });
 
-  await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export default connectDB;

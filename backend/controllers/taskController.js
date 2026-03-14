@@ -20,10 +20,50 @@ export const createTask = async (req, res) => {
 };
 
 // Get all tasks for logged-in user
+// export const getTasks = async (req, res) => {
+//     try {
+//         const tasks = await Task.find({ owner: req.user.id }).sort({ createdAt: -1 });
+//         res.json({ success: true, tasks });
+//     } catch (err) {
+//         res.status(500).json({ success: false, message: err.message });
+//     }
+// };
 export const getTasks = async (req, res) => {
     try {
-        const tasks = await Task.find({ owner: req.user.id }).sort({ createdAt: -1 });
-        res.json({ success: true, tasks });
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+
+        const search = req.query.search || "";
+        const status = req.query.status;
+
+        let query = { owner: req.user.id };
+
+        // search by title
+        if (search) {
+            query.title = { $regex: search, $options: "i" };
+        }
+
+        // filter by status (completed true/false)
+        if (status) {
+            query.completed = status === "true";
+        }
+
+        const tasks = await Task.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        const total = await Task.countDocuments(query);
+
+        res.json({
+            success: true,
+            page,
+            totalPages: Math.ceil(total / limit),
+            total,
+            tasks
+        });
+
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
