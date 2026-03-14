@@ -29,13 +29,18 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
     ? "border-green-500"
     : getPriorityColor(task.priority).split(" ")[0]
 
+  const getAuthConfig = () => ({
+    withCredentials: true,
+    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }  // ← iPhone ke liye
+  })
+
   const handleComplete = async () => {
     const newStatus = isCompleted ? "No" : "Yes"
     try {
       await axios.put(
         `${API_BASE}/${task._id}/gp`,
         { completed: newStatus },
-        { withCredentials: true }  // ← fix
+        getAuthConfig()  // ← fix
       )
       setIsCompleted(!isCompleted)
       onRefresh?.()
@@ -55,7 +60,7 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
     try {
       await axios.delete(
         `${API_BASE}/${task._id}/gp`,
-        { withCredentials: true }  // ← fix
+        getAuthConfig()  // ← fix
       )
       onRefresh?.()
     } catch (err) {
@@ -71,7 +76,7 @@ const TaskItem = ({ task, onRefresh, onLogout, showCompleteCheckbox = true }) =>
       await axios.put(
         `${API_BASE}/${task._id}/gp`,
         payload,
-        { withCredentials: true }  // ← fix
+        getAuthConfig()  // ← fix
       )
       setShowEditModal(false)
       onRefresh?.()

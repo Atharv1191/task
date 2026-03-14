@@ -18,10 +18,15 @@ const PendingTasks = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  const getAuthHeaders = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${localStorage.getItem('token')}`  // ← iPhone ke liye
+  })
+
   const handleDelete = useCallback(async (id) => {
     await fetch(`${API_BASE}/${id}/gp`, {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),  // ← fix
       credentials: 'include',
     });
     refreshTasks();
@@ -30,7 +35,7 @@ const PendingTasks = () => {
   const handleToggleComplete = useCallback(async (id, completed) => {
     await fetch(`${API_BASE}/${id}/gp`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getAuthHeaders(),  // ← fix
       credentials: 'include',
       body: JSON.stringify({ completed: completed ? 'Yes' : 'No' }),
     });
@@ -114,7 +119,7 @@ const PendingTasks = () => {
               onDelete={() => handleDelete(task._id || task.id)}
               onToggleComplete={() => handleToggleComplete(
                 task._id || task.id,
-                !task.completed  // ← fix: t.completed → task.completed
+                !task.completed
               )}
               onEdit={() => { setSelectedTask(task); setShowModal(true); }}
               onRefresh={refreshTasks}
@@ -127,8 +132,8 @@ const PendingTasks = () => {
         isOpen={!!selectedTask || showModal}
         onClose={handleCloseModal}
         taskToEdit={selectedTask}
-        onSave={handleCloseModal}   
-        onLogout={onLogout}         
+        onSave={handleCloseModal}
+        onLogout={onLogout}
       />
     </div>
   );

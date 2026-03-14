@@ -46,12 +46,14 @@ const TaskModal = ({ isOpen, onClose, taskToEdit, onSave, onLogout }) => {
     try {
       const isEdit = Boolean(taskData.id);
       const url = isEdit ? `${API_BASE}/${taskData.id}/gp` : `${API_BASE}/gp`;
+      const token = localStorage.getItem('token')  // ← token lo
       const resp = await fetch(url, {
         method: isEdit ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`  // ← add kiya
         },
-        credentials: 'include',  // ← cookie automatically jayegi
+        credentials: 'include',
         body: JSON.stringify(taskData),
       });
       if (!resp.ok) {
