@@ -10,31 +10,41 @@ const Layout = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const fetchTasks = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+ const fetchTasks = useCallback(async () => {
+  setLoading(true)
+  setError(null)
 
-    try {
-      const token = localStorage.getItem("token")
-      if (!token) throw new Error("No auth token found")
+  try {
 
-      const { data } = await axios.get("https://task-backend-virid.vercel.app/api/tasks/gp", {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+    const { data } = await axios.get(
+      "https://task-backend-virid.vercel.app/api/tasks/gp",
+      { withCredentials: true }
+    )
 
-      const arr = Array.isArray(data) ? data : 
-        Array.isArray(data?.tasks) ? data.tasks :
-        Array.isArray(data?.data) ? data.data : []
+    const arr = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.tasks)
+      ? data.tasks
+      : Array.isArray(data?.data)
+      ? data.data
+      : []
 
-      setTasks(arr)
-    } catch (err) {
-      console.error(err)
-      setError(err.message || "Could not load tasks.")
-      if (err.response?.status === 401) onLogout()
-    } finally {
-      setLoading(false)
-    }
-  }, [onLogout])
+    setTasks(arr)
+
+  } catch (err) {
+
+    console.error(err)
+
+    setError(err.message || "Could not load tasks.")
+
+    if (err.response?.status === 401) onLogout()
+
+  } finally {
+
+    setLoading(false)
+
+  }
+}, [onLogout])
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
 

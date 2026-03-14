@@ -22,36 +22,26 @@ const Login = ({ onSubmit, onSwitchMode }) => {
 
 
   // AUTO LOGIN (cookie based)
-  useEffect(() => {
+useEffect(() => {
+  const checkSession = async () => {
 
-    const checkSession = async () => {
-
+    // currentUser hai matlab already logged in tha, ab logout kiya hai — mat check karo
+    if (!localStorage.getItem('currentUser')) {  // ← sirf tab check karo jab currentUser NA ho
       try {
-
         const { data } = await axios.get(`${url}/api/user/me`, {
           withCredentials: true
         })
-
         if (data.success) {
-
           onSubmit?.({ userId: data.user.id, ...data.user })
-
-          toast.success("Session restored. Redirecting...")
-
           navigate("/")
-
         }
-
       } catch (error) {
         console.log("No active session")
       }
-
     }
-
-    checkSession()
-
-  }, [navigate, onSubmit])
-
+  }
+  checkSession()
+}, [])
 
   const handleSubmit = async (e) => {
 

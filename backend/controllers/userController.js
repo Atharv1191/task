@@ -260,3 +260,16 @@ export async function updatePassword(req, res) {
 
   }
 }
+export const logoutUser = (req, res) => {
+  res.clearCookie("token", {   // ← clearCookie use karo
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully"
+  });
+};

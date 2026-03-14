@@ -5,6 +5,7 @@ import {
     getCurrentUser,
     updateProfile,
     updatePassword,
+    logoutUser,
 } from '../controllers/userController.js';
 import authMiddleware from '../middleware/auth.js';
 
@@ -13,6 +14,8 @@ const userRouter = express.Router();
 // Public
 userRouter.post('/register', registerUser);
 userRouter.post('/login', loginUser);
+userRouter.post('/logout', logoutUser);
+
 
 // Protected
 userRouter.get('/me', authMiddleware, getCurrentUser);
