@@ -43,11 +43,10 @@ export async function registerUser(req, res) {
 
     const token = createToken(user._id);
 
-    // Store token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // production me true
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -101,11 +100,10 @@ export async function loginUser(req, res) {
 
     const token = createToken(user._id);
 
-    // HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // production me true
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
       maxAge: 24 * 60 * 60 * 1000
     });
 
