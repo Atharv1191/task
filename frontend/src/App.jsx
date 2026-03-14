@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate, Outlet } from 'react-router-dom';
+import axios from 'axios';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Pending from './pages/Pending';
@@ -9,19 +10,21 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import './index.css';
 
+// ← Axios interceptor — har API call mein token automatically jayega
+axios.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
 const App = () => {
   const navigate = useNavigate();
- const [currentUser, setCurrentUser] = useState(() => {
-  const token = localStorage.getItem('token');
-  const stored = localStorage.getItem('currentUser');
-
-  // Dono hone chahiye — sirf user object se auto-login mat karo
-  if (token && stored) {
-    return JSON.parse(stored);
-  }
-
-  return null;
-});
+  const [currentUser, setCurrentUser] = useState(() => {
+    const token = localStorage.getItem('token');
+    const stored = localStorage.getItem('currentUser');
+    if (token && stored) return JSON.parse(stored);
+    return null;
+  });
 
   useEffect(() => {
     if (currentUser) {
@@ -31,25 +34,26 @@ const App = () => {
     }
   }, [currentUser]);
 
-const handleAuthSubmit = data => {
-  // Token backend response se aana chahiye
-  if (data.token) {
-    localStorage.setItem('token', data.token);  // ← token save karo
+  const handleAuthSubmit = data => {
+    if (data.token) {
+      localStorage.setItem('token', data.token)  // ← token save
+    }
+    const user = {
+      email: data.email,
+      name: data.name || 'User',
+      avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'User')}&background=random`
+    };
+    setCurrentUser(user);
+    navigate('/', { replace: true });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('currentUser')
+    localStorage.removeItem('token')  // ← token bhi remove karo
+    setCurrentUser(null)
+    navigate('/login', { replace: true })
   }
 
-  const user = {
-    email: data.email,
-    name: data.name || 'User',
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name || 'User')}&background=random`
-  };
-  setCurrentUser(user);
-  navigate('/', { replace: true });
-};
-const handleLogout = () => {
-  localStorage.removeItem('currentUser') // ← bas yahi kaafi hai
-  setCurrentUser(null)
-  navigate('/login', { replace: true })
-}
   const ProtectedLayout = () => (
     <Layout user={currentUser} onLogout={handleLogout}>
       <Outlet />
@@ -81,7 +85,6 @@ const handleLogout = () => {
             ? <ProtectedLayout />
             : <Navigate to="/login" replace />
         }>
-
         <Route index element={<Dashboard />} />
         <Route path="pending" element={<Pending />} />
         <Route path="complete" element={<Complete />} />
